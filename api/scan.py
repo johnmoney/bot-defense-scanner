@@ -3,7 +3,7 @@
 POST /api/scan  with header  X-Scan-Key: <SCAN_KEY>  and JSON body {"url": "example.com"}
 Returns raw JSON evidence. It renders nothing; the Claude skill interprets the payload.
 
-Polite by design: homepage + robots.txt only, three homepage fetches (browser-like,
+Polite by design: homepage, robots.txt, and llms.txt only; three homepage fetches (browser-like,
 plain client, labeled bot), no crawling, no forms, no retries.
 """
 
@@ -243,6 +243,17 @@ def platform(page):
     return {"is_drupal": is_drupal, "drupal_major": major or ("7" if legacy7 else None), "other_cms": other}
 
 
+def llms_txt(base):
+    """Intent signal only: does the site publish a guide for AI agents? Not a bot control."""
+    res = safe_fetch(urljoin(base, "/llms.txt"), PROFILES["bot"])
+    if "error" in res:
+        return {"status": None, "present": False}
+    body = res.pop("_body", "")
+    looks_html = bool(re.search(r"<\s*(!doctype|html|head|body)\b", body[:500], re.I))
+    present = res.get("status") == 200 and not looks_html and len(body.strip()) > 0
+    return {"status": res.get("status"), "present": present, "bytes": len(body) if present else 0}
+
+
 def compare(probes):
     ok = {k: v for k, v in probes.items() if "error" not in v}
     base = ok.get("browser")
@@ -273,12 +284,13 @@ def scan(raw_url):
     base = f"https://{host}/"
 
     chain, ips = assert_public(host)
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=6) as pool:
         futures = {name: pool.submit(safe_fetch, base, hdrs) for name, hdrs in PROFILES.items()}
         f_robots = pool.submit(robots_rules, base)
+        f_llms = pool.submit(llms_txt, base)
         f_asn = pool.submit(asn_lookup, ips[0])
         probes = {k: f.result() for k, f in futures.items()}
-        robots, asn = f_robots.result(), f_asn.result()
+        robots, llms, asn = f_robots.result(), f_llms.result(), f_asn.result()
 
     if all("error" in p for p in probes.values()):
         raise ScanError(probes["browser"]["error"], probes["browser"].get("detail", ""))
@@ -302,8 +314,9 @@ def scan(raw_url):
         "differential": compare(probes),
         "bot_cookies": {k: v for k, v in bot_cookies.items() if v},
         "robots": robots,
+        "llms_txt": llms,
         "platform": plat,
-        "scanner": {"version": "0.2", "requests_sent": 4, "bot_user_agent": BOT_UA,
+        "scanner": {"version": "0.3", "requests_sent": 5, "bot_user_agent": BOT_UA,
                     "allowlist": "on" if ALLOWED_DOMAINS else "off"},
     }
 
