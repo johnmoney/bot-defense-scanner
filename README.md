@@ -33,7 +33,7 @@ The server-side half of the `bot-defense-check` Claude skill. It takes one URL a
 ```bash
 curl -s -X POST https://YOUR-PROJECT.vercel.app/api/scan \
   -H "X-Scan-Key: $SCAN_KEY" -H "Content-Type: application/json" \
-  -d '{"url":"www.liquormarts.ca"}' | python3 -m json.tool
+  -d '{"url":"www.example.com"}' | python3 -m json.tool
 ```
 
 6. Have an org admin add the project's domain to Claude's network allowlist under **Organization settings > Capabilities**. That one domain replaces allowlisting every prospect site.
