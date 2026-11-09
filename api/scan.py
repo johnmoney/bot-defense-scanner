@@ -321,7 +321,8 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
-        self._send(405, {"ok": False, "error": "method_not_allowed"})
+        self._send(200, {"ok": True, "service": "Bot Defense Scanner",
+                         "message": "Running. Check bot-defense-check skill in Claude for output."})
 
     def do_POST(self):
         if not SCAN_KEY:
