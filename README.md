@@ -9,12 +9,13 @@ The server-side half of the `bot-defense-check` Claude skill. It takes one URL a
 - **DNS and network owner:** CNAME chain and ASN through DNS-over-HTTPS
 - **Hidden cookies:** reads `Set-Cookie` names, including HttpOnly bot cookies such as `__cf_bm`
 - **Redirect hops:** records each one
+- **AI agent intent:** whether the site publishes an llms.txt file. This is an intent signal, not a bot control.
 - **Platform tag inputs:** Drupal major version or non-Drupal CMS
 
 ## Guardrails built in
 
 - **Gated:** every call needs the `X-Scan-Key` header. With no key configured, it fails closed.
-- **Polite:** four requests to the target per scan (three homepage fetches and robots.txt), with no crawling, forms, or retries.
+- **Polite:** five requests to the target per scan (three homepage fetches, robots.txt, and llms.txt), with no crawling, forms, or retries.
 - **Optional target allowlist:** `ALLOWED_DOMAINS` is off by default (all public domains allowed). When populated, only those domains can be scanned.
 - **SSRF guard:** refuses any host or redirect that resolves to a private, loopback, or reserved address. This applies whether or not the allowlist is on.
 - **Clean errors:** returns stable codes (`domain_not_found`, `no_response`, `blocked_target`, `redirect_loop`, `invalid_url`, `scan_failed`) that the skill maps to plain-language messages. It never returns a stack trace.
