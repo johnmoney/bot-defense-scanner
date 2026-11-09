@@ -41,7 +41,7 @@ curl -s -X POST https://YOUR-PROJECT.vercel.app/api/scan \
 
 ## Notes
 
-- **Hobby plan:** Vercel's Hobby plan is for personal, non-commercial use. Fine for a proof of concept; move to Pro or an Acquia-owned account before AEs depend on it.
+- **Hobby plan:** Vercel's Hobby plan is for personal, non-commercial use. Fine for a proof of concept; move to Pro or a corporate-owned account before roll out.
 - **Timeout:** `maxDuration` is set to 30 seconds. A typical scan takes 2 to 6 seconds. Lower it if your plan rejects the value.
 - **Rotating the key:** change `SCAN_KEY` in Vercel and in the skill at the same time.
 - **Out of scope:** Salesforce integration is deliberately left out; this is an on-demand tool.
