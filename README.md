@@ -26,7 +26,7 @@ The server-side half of the `bot-defense-check` Claude skill. It takes one URL a
 1. Create a GitHub repo with these files: `api/scan.py`, `requirements.txt`, `vercel.json`.
 2. In Vercel, select **Add New > Project** and import the repo. No framework preset is needed.
 3. Under **Settings > Environment Variables**, add `SCAN_KEY` as a long random string, for example from `openssl rand -hex 32`.
-   - Optional `ALLOWED_DOMAINS`: leave it unset to allow scanning any public domain. Populate it with comma-separated domains, such as `acquia.com,yale.edu,liquormarts.ca`, to restrict scans to those domains and their subdomains. Redirects are checked too. Anything else returns `domain_not_allowed`.
+   - Optional `ALLOWED_DOMAINS`: leave it unset to allow scanning any public domain. Populate it with comma-separated domains, such as `example.com,example.edu,example.ca`, to restrict scans to those domains and their subdomains. Redirects are checked too. Anything else returns `domain_not_allowed`.
 4. Deploy, then note the URL, for example `https://bot-defense-scanner.vercel.app`.
 5. Test it:
 
